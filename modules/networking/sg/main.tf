@@ -40,16 +40,19 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = var.ssh_ingress_cidr_blocks
   }
 
-  # Allow inbound HTTPS traffic from anywhere (port 443) - Optional if using HTTPS
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    description = "Allow HTTPS traffic from anywhere"
-    cidr_blocks = var.ssh_ingress_cidr_blocks
+  # Allow inbound traffic on the specified ports from specific IPs
+  dynamic "ingress" {
+    for_each = var.allowed_ingress
+    content {
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      description = "Allow traffic from specified IPs"
+      cidr_blocks = ingress.value.cidr_blocks
+    }
   }
 
-  # Egress rules to allow traffic to go out (to ECS tasks or other destinations)
+  # Egress rules to allow traffic to go out
   egress {
     from_port   = 0
     to_port     = 0
