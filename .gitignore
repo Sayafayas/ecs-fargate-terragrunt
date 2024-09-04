@@ -90,5 +90,5 @@ docs/
 examples/
 live/
 modules/iam
-modules/kms
 modules/rds
+modules/ecs

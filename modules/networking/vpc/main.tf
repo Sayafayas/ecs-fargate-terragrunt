@@ -2,7 +2,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   cidr_part        = trimsuffix(var.cidr, ".0.0")
-  eks_cluster_name = "${var.deployment_prefix}-eks-cluster"
+  ecs_cluster_name = "${var.deployment_prefix}-cluster"
 }
 
 module "vpc" {
@@ -20,6 +20,7 @@ module "vpc" {
   single_nat_gateway                 = var.single_nat_gateway
   one_nat_gateway_per_az             = var.one_nat_gateway_per_az
   enable_dns_hostnames               = true
+  enable_dns_support                 = true
   create_igw                         = true
   create_database_subnet_route_table = true
 
@@ -29,13 +30,13 @@ module "vpc" {
 
   public_subnet_tags = {
     "Name"                                            = "public-subnet-${var.deployment_prefix}"
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.ecs_cluster_name}" = "shared"
     "kubernetes.io/role/elb"                          = "1"
   }
 
   private_subnet_tags = {
     "Name"                                            = "private-subnet-${var.deployment_prefix}"
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${local.ecs_cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"                 = "1"
   }
 
